@@ -1,0 +1,10 @@
+{
+    "name": "cirs/permission-package",
+    "description": "package for permissions",
+    "autoload": {
+        "psr-4": {
+            "Cirs\\PermissionPackage\\": "src/"
+        }
+    },
+    "require": {}
+}
