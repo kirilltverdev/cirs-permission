@@ -20,9 +20,9 @@ class StudentPermission
     public function canCreate($user, $data): bool
     {
         return $this->isSystemAdmin($user) ||
-            $this->checkDistrictAdmin($user, $data['district_id']) ||
-            $this->checkSchoolAdmin($user, $data['school_id']) ||
-            $this->checkGCSMHSchool($user, $data['school_id']);
+            $this->checkDistrictAdmin($user, $data['district']) ||
+            $this->checkSchoolAdmin($user, $data['school']) ||
+            $this->checkGCSMHSchool($user, $data['school']);
     }
 
     public function canUpdate($user, $student): bool
@@ -34,17 +34,10 @@ class StudentPermission
             $this->studentHasUser($user, $student);
     }
 
-    public function delete($user, $student): bool
+    public function canDelete($user, $student): bool
     {
         return  $this->isSystemAdmin($user) ||
             $this->checkDistrictAdmin($user, $student->school->district_id) ||
             $this->checkSchoolAdmin($user, $student->school_id);
-    }
-
-    protected function studentHasUser($user, $student): bool
-    {
-        $usersIds = $student->users()->pluck('users.id')->toArray();
-
-        return in_array($user->getKey(), $usersIds) && $user->school()->first()->getKey() === $student->school()->getKey();
     }
 }

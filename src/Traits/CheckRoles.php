@@ -43,4 +43,34 @@ trait CheckRoles
             Role::ROLE_SCHOOL_ADMIN
         ]);
     }
+
+    protected function studentHasUser($user, $student): bool
+    {
+        $usersIds = $student->users()->pluck('users.id')->toArray();
+
+        return in_array($user->getKey(), $usersIds) && $user->school()->first()->getKey() === $student->school()->getKey();
+    }
+
+    public function checkLinkedUsers($authUser, $viewUser): bool
+    {
+        $userStudentsIds = $authUser->studentsRelation()->pluck('students.id')->toArray();
+        $viewedUserStudents = $viewUser->studentsRelation()->pluck('students.id')->toArray();
+
+        $hasSameLinkedStudent = false;
+        foreach ($userStudentsIds as $studentId) {
+            if (in_array($studentId, $viewedUserStudents)) {
+                $hasSameLinkedStudent = true;
+            }
+        }
+
+        return $authUser->role->name === Role::ROLE_GUARDIAN && $hasSameLinkedStudent;
+    }
+
+    public function checkStudentsSchool($user, int $schoolId): bool
+    {
+        $student = $user->studentsRelation()?->first();
+
+        return $user->role->name === Role::ROLE_GUARDIAN &&
+            $student->school_id === $schoolId;
+    }
 }
